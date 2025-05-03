@@ -1,0 +1,29 @@
+<entity-mappings
+        version="2.2"
+        xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+        http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd">
+    <persistence-unit-metadata>
+<!--        <xml-mapping-metadata-complete/>-->
+        <persistence-unit-defaults>
+            <delimited-identifiers/>
+        </persistence-unit-defaults>
+    </persistence-unit-metadata>
+    <entity class="com.catalin.javapersistence.models.Message"
+            access="FIELD">
+        <attributes>
+<!--            <id name="ormXmlTestFieldId">-->
+<!--                <column name="orm_xml_test_field_id" />-->
+<!--                <generated-value strategy="AUTO"/>-->
+<!--            </id>-->
+            <basic name="ormXmlTestFieldString">
+                <column name="orm_xml_test_field_string" />
+            </basic>
+            <basic name="ormXmlTestFieldZonedDateTime">
+                <column name="ormo_xml_test_field_zoned_date_time" />
+                <temporal>TIMESTAMP</temporal>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>
