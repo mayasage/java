@@ -1,0 +1,15 @@
+com/catalin/javapersistence/models/BidItemTest.class
+com/catalin/javapersistence/HelloWorldSessionFactoryToJPATest.class
+com/catalin/javapersistence/HelloWorldJPATest.class
+com/catalin/javapersistence/models/OrmXmlMessageTest.class
+com/catalin/javapersistence/repositories/RepositoryTestsBaseClass.class
+com/catalin/javapersistence/models/UserTest.class
+com/catalin/javapersistence/HelloWorldHibernateTest.class
+com/catalin/javapersistence/JavapersistenceApplicationTests.class
+com/catalin/javapersistence/repositories/BidSummaryRepositoryTest.class
+com/catalin/javapersistence/SpringDataJPATest.class
+com/catalin/javapersistence/MetaModelTest.class
+com/catalin/javapersistence/HelloWorldXmlEntityManagerTest.class
+com/catalin/javapersistence/repositories/UserRepositoryTest.class
+com/catalin/javapersistence/session/HibernateSessionTest.class
+com/catalin/javapersistence/HelloWorldXmlHibernateSessionFactoryTest.class
