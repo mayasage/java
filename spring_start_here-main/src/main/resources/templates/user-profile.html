@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <title>User Profile</title>
+</head>
+<body>
+        Welcome back, Agent <span th:text="${username}"></span><br>
+        Your login number is: <span th:text="${loginAttemptNumber}"></span><br>
+        <a href="/user-profile?logout">Log out</a>
+</body>
+</html>
