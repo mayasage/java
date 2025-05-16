@@ -79,6 +79,13 @@ public class DeleteBeforeInsertTest {
         }
 
         @Test
+        void seeIfItExist() {
+                Post post = em.createQuery("select p from Post p", Post.class).getSingleResult();
+                Assertions.assertNotNull(post);
+                System.out.println("Post: Title: " + post.getTitle() + ", Slug: " + post.getSlug());
+        }
+
+        @Test
         void throwsError() {
                 Post post = em.createQuery("select p from Post p", Post.class).getSingleResult();
                 Assertions.assertNotNull(post);
