@@ -1,0 +1,90 @@
+spring:
+        config:
+                import:
+                        - application_prod.yaml
+                        - application_uat.yaml
+
+#        profiles:
+#                active: prod
+
+        application:
+                name: easyschool
+
+        datasource:
+                url: ${AZURE_DB_URL}
+                username: ${AZURE_DB_USER}
+                password: ${AZURE_DB_PASS}
+
+        jpa:
+                database-platform: org.hibernate.dialect.SQLServerDialect
+
+                hibernate:
+                        ddl-auto: validate
+
+                show-sql: true
+
+                properties:
+
+                        hibernate:
+                                format_sql: true
+
+                        javax:
+                                persistence:
+                                        validation:
+                                                mode: none
+
+        h2:
+                console:
+                        enabled: true
+
+        flyway:
+                enabled: true
+                baseline-on-migrate: true
+                user: ${AZURE_DB_USER}
+                password: ${AZURE_DB_PASS}
+                baseline-description: "init"
+                baseline-version: 1
+
+        # These are for spring data rest starter & hal explorer only
+        data:
+                rest:
+                        base-path: /data-api
+
+        # Spring Boot Admin properties
+        boot:
+                admin:
+                        client:
+                                instance:
+                                        metadata:
+                                                user:
+                                                        name: ${SPRING_BOOT_ADMIN_USER}
+                                                        password: ${SPRING_BOOT_ADMIN_PASS}
+                                url: ${SPRING_BOOT_ADMIN_URL}
+
+# This will work for all packages in the application
+logging:
+        level:
+                root: info
+
+# Actuator properties
+management:
+        endpoints:
+                web:
+                        exposure:
+                                include: "*"
+
+                        base-path: /easyschool/actuator
+
+# Copy-pasted from easyschool.application.yaml file.
+# Read the comment there if you want to know more.
+easyschool:
+
+        page-size: 5
+        contact:
+                page-size: 5
+
+        branches:
+                - NewYork
+                - Delhi
+                - Paris
+                - Singapore

@@ -1,0 +1,25 @@
+spring:
+        config:
+                activate:
+                        on-profile: uat
+
+        jpa:
+                properties:
+                        hibernate:
+                                format_sql: false
+
+logging:
+        level:
+                root: WARN
+
+                org:
+                        blacksage:
+                                learn:
+                                        easyschool:
+                                                aspects:
+
+easyschool:
+        contact:
+                page-size: 7
+
+        page-size: 7

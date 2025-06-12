@@ -1,0 +1,17 @@
+server:
+        port: 8081
+
+spring:
+        application:
+                name: easyschoolApiConsumer
+
+easyschool:
+        api:
+                base-url: http://localhost:8080/api
+                auth:
+                        admin:
+                                username: admin@easyschool.com
+                                password: admin@easyschool.com
+                        sage:
+                                username: sage@blacksage.org
+                                password: sage@blacksage.org

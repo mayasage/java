@@ -1,0 +1,25 @@
+spring:
+        config:
+                activate:
+                        on-profile: prod
+
+        jpa:
+                show-sql: false
+                properties:
+                        hibernate:
+                                format_sql: false
+
+logging:
+        level:
+                root: ERROR
+                org:
+                        blacksage:
+                                learn:
+                                        easyschool:
+                                                aspects: ERROR
+
+easyschool:
+        contact:
+                page-size: 10
+
+        page-size: 10

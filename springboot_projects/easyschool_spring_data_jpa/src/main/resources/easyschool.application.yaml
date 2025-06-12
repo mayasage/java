@@ -1,0 +1,14 @@
+# I am copy-pasting these into the application.yaml file because I'm not using
+# @PropertySource.
+# If you want to use @PropertySource, then remove these lines from application.yaml
+easyschool:
+
+        page-size: 5
+        contact:
+                page-size: 5
+
+        branches:
+                - NewYork
+                - Delhi
+                - Paris
+                - Singapore
