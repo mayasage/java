@@ -8,8 +8,5 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/springboot_projects/easyschoolApiConsumer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/springboot_projects/easyschool_spring_data_jdbc" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/springboot_projects/easyschool_spring_data_jpa" vcs="Git" />
   </component>
 </project>
