@@ -1,0 +1,40 @@
+server:
+        port: 8080
+
+spring:
+        application:
+                name: accounts
+
+        datasource:
+                url: jdbc:h2:mem:testdb
+                driverClassName: org.h2.Driver
+                username: a
+                password: ''
+        h2:
+                console:
+                        enabled: true
+        jpa:
+                database-platform: org.hibernate.dialect.H2Dialect
+                hibernate:
+                        ddl-auto: update
+                show-sql: true
+        config:
+                import:
+                        - application_qa.yml
+                        - application_prod.yml
+# Do it via command line arguments, JVM system properties or environment variables
+#        profiles:
+#                active:
+#                        - qa
+
+build:
+        version: 1.0.0-local
+
+accounts:
+        message: Hello from accounts Local service
+        contact:
+                name: Reverend Father Papa John - Local Father
+                email: rfpapa@gmail.com
+        onCallSupport:
+                - (555) 555-1234
+                - (555) 523-1345

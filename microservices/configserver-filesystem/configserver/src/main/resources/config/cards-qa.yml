@@ -1,0 +1,11 @@
+build:
+        version: 1.0.0-qa
+
+cards:
+        message: Hello from cards QA service
+        contact:
+                name: Reverend Father Papa John - QA King
+                email: rfpapa@gmail.com
+        onCallSupport:
+                - (555) 555-1234
+                - (555) 523-1345

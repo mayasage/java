@@ -1,0 +1,11 @@
+build:
+        version: 1.0.0-local
+
+cards:
+        message: Hello from cards Local service
+        contact:
+                name: Reverend Father Papa John - Local Father
+                email: rfpapa@gmail.com
+        onCallSupport:
+                - (555) 555-1234
+                - (555) 523-1345

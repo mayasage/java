@@ -1,0 +1,18 @@
+spring:
+        application:
+                name: configserver
+        # tell Spring Cloud where your configurations are
+        profiles:
+                active: native
+        cloud:
+                config:
+                        server:
+                                native:
+                                        # this will expose your yml files
+                                        # search-locations: classpath:/config/
+                                        # do this instead:
+                                        # don't push config, download it from somewhere else, put it into your file system and point to it here
+                                        search-locations: /home/sage/Downloads/mayasage/microservices/configserver/src/main/resources/config
+
+server:
+        port: 8071

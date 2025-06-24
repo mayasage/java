@@ -1,0 +1,11 @@
+build:
+        version: 1.0.0-prod
+
+loans:
+        message: Hello from loans PROD service
+        contact:
+                name: Reverend Father Papa John - Prod Father
+                email: rfpapa@gmail.com
+        onCallSupport:
+                - (555) 555-1234
+                - (555) 523-1345
