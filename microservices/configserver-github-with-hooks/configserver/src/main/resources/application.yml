@@ -1,0 +1,33 @@
+spring:
+        application:
+                name: configserver
+        # tell Spring Cloud where your configurations are
+        profiles:
+                active: git
+        cloud:
+                config:
+                        server:
+                                git:
+                                        uri: https://github.com/mayasage/java-easybytes-config.git # https
+                                        default-label: main # branch to use
+                                        timeout: 5 # seconds
+                                        clone-on-start: true # server won't start otherwise
+                                        force-pull: true # always override local changes
+        rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+
+encrypt:
+        key: F4D9A518E9967BF91849FF975F7EA
+
+server:
+        port: 8071
+
+# needed for spring cloud config monitor
+mnanagement:
+        endpoints:
+                web:
+                        exposure:
+                                include: '*'

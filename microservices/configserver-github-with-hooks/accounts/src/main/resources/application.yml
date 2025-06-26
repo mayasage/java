@@ -1,0 +1,38 @@
+server:
+        port: 8080
+
+spring:
+        application:
+                name: accounts
+        # change this via environment or command line
+        # profiles:
+        #        active: prod
+        # need the prefix "configserver:" to say we're using Spring Cloud Config Server
+        # optional because the properties written in "configserver" are not mandatory
+        config:
+                import: optional:configserver:http://localhost:8071/
+        datasource:
+                url: jdbc:h2:mem:testdb
+                driverClassName: org.h2.Driver
+                username: a
+                password: ''
+        h2:
+                console:
+                        enabled: true
+        jpa:
+                database-platform: org.hibernate.dialect.H2Dialect
+                hibernate:
+                        ddl-auto: update
+                show-sql: true
+        # these are default, so no need to specify them
+        rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+
+management:
+        endpoints:
+                web:
+                        exposure:
+                                include: '*'
