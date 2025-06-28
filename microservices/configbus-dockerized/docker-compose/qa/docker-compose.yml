@@ -1,0 +1,109 @@
+services:
+
+        # rabbitmq is required for Spring Cloud Bus
+        rabbitmq:
+                image: rabbitmq:4-management
+                container_name: rabbitmq
+                hostname: rabbitmq
+                ports:
+                        - "5672:5672"
+                        - "15672:15672"
+                healthcheck:
+                        test: rabbitmq-diagnostics check_port_connectivity
+                        interval: 10s
+                        timeout: 5s
+                        retries: 10
+                        start_period: 5s
+                # in plain English copy-paste everything from there to here
+                extends:
+                        file: common-configurations.yml
+                        service: common-network
+
+        # handles the configurations that are fetches from a GitHub repository (ideally, should be private but not done for ease of use)
+        configserver:
+                image: mayasage/configserver:s1
+                container_name: configserver-microservice
+                ports:
+                        - "8071:8071"
+                # configserver will only start when rabbitmq started completely
+                depends_on:
+                        rabbitmq:
+                                condition: service_healthy # uses your healthcheck
+                healthcheck:
+                        # eclipse-temurin 24 jre doesn't have curl
+                        # test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+                        # --no-verbose will reduce the output of the command to a single line
+                        # --tries=1 will prevent wget from trying indefinitely
+                        # --spider will make wget just check for existence, not download any page
+                        # exit 1 - Ensures exit code 1 on failure.
+                        # Healthcheck only expects the following:
+                        #       0: success - the container is healthy and ready for use
+                        #       1: unhealthy - the container is not working correctly
+                        #       2: reserved - do not use this exit code
+                        # test: "wget --no-verbose --tries=1 --spider http://localhost:8071/actuator/health/readiness || exit 1"
+                        # -O - is used to provide the URL
+                        # -q will print only the body
+                        test: "wget --tries=1 -q -O - http://localhost:8071/actuator/health/readiness | grep UP || exit 1"
+                        interval: 10s
+                        timeout: 5s
+                        retries: 10
+                        start_period: 10s
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-every-microservice
+
+        # No need to mention rabbitmq further, because all these microservices depend upon configserver
+        # and confiserver depends on rabbitmq.
+        # So, there is an indirect dependency automatically.
+        accounts:
+                image: mayasage/accounts:s1
+                container_name: accounts-microservice
+                ports:
+                        - "8080:8080"
+                # as soon as the configserver starts, Account service will also start.
+                # this is a problem, it must wait till the configserver is ready.
+                # depends_on: configserver
+                depends_on:
+                        configserver:
+                                # service_started is the default
+                                # service_healthy with your custom healthcheck with readiness healthy will do it
+                                condition: service_healthy
+                environment:
+                        # equivalent to spring.application.name in application properties.
+                        # this must be equal to the service name
+                        SPRING_APPLICATION_NAME: accounts
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-non-config-microservices
+
+        loans:
+                image: mayasage/loans:s1
+                container_name: loans-microservice
+                ports:
+                        - "8090:8090"
+                depends_on:
+                        configserver:
+                                condition: service_healthy
+                environment:
+                        SPRING_APPLICATION_NAME: loans
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-non-config-microservices
+
+        cards:
+                image: mayasage/cards:s1
+                container_name: cards-microservice
+                ports:
+                        - "9000:9000"
+                depends_on:
+                        configserver:
+                                condition: service_healthy
+                environment:
+                        SPRING_APPLICATION_NAME: cards
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-non-config-microservices
+
+networks:
+        easybank:
+                driver: bridge

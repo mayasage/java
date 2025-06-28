@@ -1,0 +1,37 @@
+# Dump common things in the yml files here.
+
+services:
+
+        # every microservice (even third-party require this)
+        common-network:
+                networks:
+                        - easybank
+
+        common-parts-in-every-microservice:
+                # every microservice...
+                extends:
+                        # needs this common-network
+                        service: common-network
+                deploy:
+                        # needs to be deployed with these configurations
+                        resources:
+                                limits:
+                                        memory: 700m
+                environment:
+                        SPRING_RABBITMQ_HOST: "rabbitmq"
+
+        # cards, loans, accounts -- the one you've written, not third-party rabbitmq
+        common-parts-in-non-config-microservices:
+                extends:
+                        service: common-parts-in-every-microservice
+                # used to work, but not anymore.
+                # you'll have to add this in your docker-compose.yml
+                # depends_on:
+                #        configserver:
+                #                condition: service_healthy
+                environment:
+                        # It is equivalent to spring.config.import in the application.properties
+                        # The first configserver is mandatory for Spring Config Server
+                        # The second configserver is the name of the service
+                        SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+                        SPRING_PROFILES_ACTIVE: qa
