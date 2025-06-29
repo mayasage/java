@@ -1,0 +1,158 @@
+services:
+
+        # rabbitmq is required for Spring Cloud Bus
+        rabbitmq:
+                image: rabbitmq:4-management@sha256:9d67e45bc6cb788648b3b2dc453869c67ef41e8a75d16706205dc63db92ccd2f
+                container_name: easybank-rabbitmq
+                hostname: rabbitmq
+                ports:
+                        - "5672:5672"
+                        - "15672:15672"
+                healthcheck:
+                        test: rabbitmq-diagnostics check_port_connectivity
+                        interval: 10s
+                        timeout: 5s
+                        retries: 10
+                        start_period: 5s
+                # in plain English copy-paste everything from there to here
+                extends:
+                        file: common-configurations.yml
+                        service: common-network
+
+        # databases
+        database-accounts:
+                container_name: easybank-database-accounts
+                # These ports are not needed for running the application, the microservices will access these databases via their service names.
+                # But these are necessary for connecting the database to a third-party application like DataGrip.
+                ports:
+                        - "3306:3306"
+                environment:
+                        MYSQL_DATABASE: accountsDB
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-databases
+
+        database-loans:
+                container_name: easybank-database-loans
+                ports:
+                        - "3307:3306"
+                environment:
+                        MYSQL_DATABASE: loansDB
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-databases
+
+        database-cards:
+                container_name: easybank-database-cards
+                ports:
+                        - "3308:3306"
+                environment:
+                        MYSQL_DATABASE: cardsDB
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-databases
+
+        # handles the configurations that are fetches from a GitHub repository (ideally, should be private but not done for ease of use)
+        configserver:
+                image: mayasage/configserver:s1@sha256:704aaa8139a20134183046fb9c5c151f76cd0cad1ce7305514da389d29b54e56
+                container_name: easybank-configserver-microservice
+                ports:
+                        - "8071:8071"
+                # configserver will only start when rabbitmq started completely
+                depends_on:
+                        rabbitmq:
+                                condition: service_healthy # uses your healthcheck
+                healthcheck:
+                        # eclipse-temurin 24 jre doesn't have curl
+                        # test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+
+                        # --no-verbose will reduce the output of the command to a single line
+                        # --tries=1 will prevent wget from trying indefinitely
+                        # --spider will make wget just check for existence, not download any page
+                        # exit 1 - Ensures exit code 1 on failure.
+                        # Healthcheck only expects the following:
+                        #       0: success - the container is healthy and ready for use
+                        #       1: unhealthy - the container is not working correctly
+                        #       2: reserved - do not use this exit code
+                        # test: "wget --no-verbose --tries=1 --spider http://localhost:8071/actuator/health/readiness || exit 1"
+                        # -O - is used to provide the URL
+                        # -q will print only the body
+                        test: "wget --tries=1 -q -O - http://localhost:8071/actuator/health/readiness | grep UP || exit 1"
+                        interval: 10s
+                        timeout: 5s
+                        retries: 10
+                        start_period: 10s
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-every-microservice
+
+        # No need to mention rabbitmq further, because all these microservices depend upon configserver
+        # and confiserver depends on rabbitmq.
+        # So, there is an indirect dependency automatically.
+        accounts:
+                image: mayasage/accounts:s1@sha256:89fad5af8354ca03bd71794d5dce881cc412d30eb78cfc341eafb2fc6c815f03
+                container_name: easybank-non-config-microservice-accounts
+                ports:
+                        - "8080:8080"
+                # as soon as the configserver starts, account service will also start.
+                # this is a problem, it must wait till the configserver is ready.
+                # depends_on: configserver
+                depends_on:
+                        configserver:
+                                # service_started is the default
+                                # service_healthy with your custom healthcheck with readiness healthy will do it
+                                condition: service_healthy
+                        database-accounts:
+                                condition: service_healthy
+                environment:
+                        # equivalent to spring.application.name in application properties.
+                        # this must be equal to the service name
+                        spring_application_name: accounts
+                        spring_datasource_url: "jdbc:mysql://database-accounts:3306/accountsDB"
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-non-config-microservices
+
+        loans:
+                image: mayasage/loans:s1@sha256:c48e486f3cb72079fcf2a1ef62f0adc8b06e1b6773f2b1e1b3020ac9a8df8d20
+                container_name: easybank-non-config-microservice-loans
+                ports:
+                        - "8090:8090"
+                depends_on:
+                        configserver:
+                                condition: service_healthy
+                        database-loans:
+                                condition: service_healthy
+                environment:
+                        SPRING_APPLICATION_NAME: loans
+                        # Note this is 3306 and NOT 3307
+                        # This is because this loans-microservice is inside the same docker network as database-loans.
+                        # Does that mean there is only 1 database?
+                        # Absolutely not, there are 3 different databases; the differentiating factor is their IP address
+                        # Notice this has a prefix of "database-loans" as opposed to "database-accounts" in the accounts-microservice
+                        # These names are effectively resolved to unique IP addresses.
+                        SPRING_DATASOURCE_URL: "jdbc:mysql://database-loans:3306/loansDB"
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-non-config-microservices
+
+        cards:
+                image: mayasage/cards:s1@sha256:85af89e96601fdd2d3491c856cb2be7ca465462b6ace97e8d1d5c126430beb7c
+                container_name: easybank-non-config-microservice-cards
+                ports:
+                        - "9000:9000"
+                depends_on:
+                        configserver:
+                                condition: service_healthy
+                        database-cards:
+                                condition: service_healthy
+                environment:
+                        SPRING_APPLICATION_NAME: cards
+                        SPRING_DATASOURCE_URL: "jdbc:mysql://database-cards:3306/cardsDB"
+                extends:
+                        file: common-configurations.yml
+                        service: common-parts-in-non-config-microservices
+
+networks:
+        easybank:
+                driver: bridge

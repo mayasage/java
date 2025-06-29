@@ -1,0 +1,52 @@
+# docker-compose can overwrite any of these properties
+# For example, to overwrite spring.application.name, you'll write "SPRING_APPLICATION_NAME" in the docker-compose
+# file, under the environment.
+server:
+        port: 8080
+
+spring:
+        application:
+                name: accounts
+
+        # change this via environment or command line
+        # profiles:
+        #        active: prod
+        # need the prefix "configserver:" to say we're using Spring Cloud Config Server
+
+        # optional here is very important - your container will crash without it
+        # to understand this, first you have to understand that these "config.import" stacks
+        # you can provide hundreds of this at different locations
+        # so when you use docker, you don't want the localhost "config.import"
+        # it's just not there
+        # that is why you make this optional
+        # when you run without docker, the localhost will be used (if present)
+        # when docker is there, it will NOT overwrite, but give one more configuration url: configserver service url
+        # springboot will attempt to access both
+        # your localhost will fail because no configserver is running inside the container on localhost:8071 in the accounts service
+        config:
+                import: optional:configserver:http://localhost:8071/
+        # I actually never ran this locally.
+        # To do that, I'd have to manually start mysql via docker command, give it this db and password, only then it would run.
+        # But it's going to get updated by the docker-compose file.
+        datasource:
+                url: "jdbc:mysql://localhost:3306/accountsDB"
+                username: root
+                password: root
+        # always run the schema.sql file at startup
+        sql:
+                init:
+                        mode: always
+        jpa:
+                show-sql: true
+        # these are default, so no need to specify them
+        rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+
+management:
+        endpoints:
+                web:
+                        exposure:
+                                include: '*'
